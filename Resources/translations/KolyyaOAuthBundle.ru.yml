@@ -1,0 +1,17 @@
+login:
+    vkontakte: Войти через ВКонтакте
+    facebook: Войти через Facebook
+    odnoklassniki: Войти через Одноклассники
+    mailru: Войти через Mail
+    google: Войти через Google
+
+connect:
+    vkontakte: Привязать аккаунт ВКонтакте
+    facebook: Привязать аккаунт Facebook
+    odnoklassniki: Привязать аккаунт Одноклассники
+    mailru: Привязать аккаунт Mail
+    google: Привязать аккаунт Google
+
+layout:
+    connect: Привязать
+    disconnect: Отвязать

@@ -1,0 +1,4 @@
+services:
+    kolyya_oauth.provider.oauth:
+        class:        Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
+        arguments: ['@translator', '%mailer_user%', '@service_container', '@fos_user.user_manager.default']
