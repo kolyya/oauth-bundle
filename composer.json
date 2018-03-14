@@ -13,7 +13,7 @@
     "require" : {
         "php": ">=5.3.2",
         "symfony/symfony": ">=3.4",
-        "hwi/oauth-bundle": "0.5.*"
+        "hwi/oauth-bundle": "0.6.*"
     },
     "autoload" : {
         "psr-4" : { "Kolyya\\PhotoBundle\\" : "" }
