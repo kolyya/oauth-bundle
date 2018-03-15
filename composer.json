@@ -16,7 +16,7 @@
         "hwi/oauth-bundle": "0.6.*"
     },
     "autoload" : {
-        "psr-4" : { "Kolyya\\PhotoBundle\\" : "" }
+        "psr-4" : { "Kolyya\\OAuthBundle\\" : "" }
     },
     "extra" : {
         "branch-alias" : {
