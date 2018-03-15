@@ -1,0 +1,26 @@
+{
+    "name" : "kolyya/oauth-bundle",
+    "description" : "Oauth",
+    "version" : "0.1.0",
+    "type" : "symfony-bundle",
+    "homepage" : "https://github.com/kolyya",
+    "license" : "MIT",
+    "keywords" : ["oauth"],
+    "authors" : [{
+        "name" : "Nikolai Gurin",
+        "email" : "0kolyya@gmail.com"
+    }],
+    "require" : {
+        "php": ">=5.3.2",
+        "symfony/framework-bundle": "^3.0|^4.0",
+        "hwi/oauth-bundle": "0.6.*"
+    },
+    "autoload" : {
+        "psr-4" : { "Kolyya\\PhotoBundle\\" : "" }
+    },
+    "extra" : {
+        "branch-alias" : {
+          "dev-master" : "0.1.x-dev"
+        }
+    }
+}
