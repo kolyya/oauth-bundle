@@ -63,13 +63,19 @@ class AppKernel extends Kernel
 В `config/services.yaml` сделать сервис публичным:
 
 ```yaml
-    Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider:
+services:
+    # ...
+    kolyya.oauth.user.provider:
+        class: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
+        arguments: ['','','','%env(MAILER_USER)%']
         public: true
 ```
 
 и установить его в `config/packages/security.yaml`
 
 ```yaml
+security:
+    # ...
     firewalls:
         # ...
         main:
@@ -77,7 +83,7 @@ class AppKernel extends Kernel
             oauth:
                 # ...
                 oauth_user_provider:
-                    service: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
+                    service: kolyya.oauth.user.provider
         # ...
 ```
 
@@ -87,7 +93,7 @@ class AppKernel extends Kernel
 hwi_oauth:
     # ...
     connect:
-        account_connector: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
+        account_connector: kolyya.oauth.user.provider
     # ...
 ```
 

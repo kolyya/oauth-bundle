@@ -2,13 +2,11 @@
 
 namespace Kolyya\OAuthBundle\Security\Core\User;
 
-use AppBundle\Entity\User;
 use FOS\UserBundle\Model\UserManagerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -24,6 +22,14 @@ class OAuthUserProvider extends BaseClass
     private $service;
     private $socialId;
     private $token;
+
+    /**
+     * OAuthUserProvider constructor.
+     * @param TranslatorInterface $translator
+     * @param ContainerInterface $container
+     * @param UserManagerInterface $userManager
+     * @param null $mailerUser
+     */
     public function  __construct(
         TranslatorInterface $translator,
         ContainerInterface $container,
@@ -153,9 +159,7 @@ class OAuthUserProvider extends BaseClass
      */
     public function connect(UserInterface $user, UserResponseInterface $response)
     {
-        if (!$user instanceof User) {
-            throw new UnsupportedUserException(sprintf('Expected an instance of FOS\UserBundle\Model\User, but got "%s".', get_class($user)));
-        }
+        // todo: проверка $user на то, что это User
 
         // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
         $this->token = $response->getAccessToken();
