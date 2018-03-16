@@ -98,3 +98,87 @@ hwi_oauth:
 ```
 
 ## Configuration
+
+### Настройка User Entity
+
+Унаследовать User от Kolyya\OAuthBundle\Entity\OAuthUser:
+
+```php
+// src/Entity/User.php
+
+// ...
+use Kolyya\OAuthBundle\Entity\OAuthUser;
+
+// ...
+class User extends OAuthUser
+{
+// ...
+
+```
+
+Добавить свойства для хранения данных из соц сетей:
+
+```php
+// src/Entity/User.php
+
+// ...
+class User extends OAuthUser
+{
+    // ...
+    /**
+     * @ORM\Column(type="json_array", nullable=true)
+     */
+    protected $vkontakteData;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    protected $vkontakteId;
+    
+    /**
+     * @return mixed
+     */
+    public function getVkontakteData()
+    {
+        return $this->vkontakteData;
+    }
+
+    /**
+     * @param mixed $vkontakteData
+     */
+    public function setVkontakteData($vkontakteData)
+    {
+        $this->vkontakteData = $vkontakteData;
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getVkontakteId()
+    {
+        return $this->vkontakteId;
+    }
+
+    /**
+     * @param mixed $vkontakteId
+     */
+    public function setVkontakteId($vkontakteId)
+    {
+        $this->vkontakteId = $vkontakteId;
+    }
+    
+    // ...
+}
+
+```
+
+
+### Добавить маршруты
+
+```yaml
+# config/routes.yaml
+# ...
+kolyya_oauth:
+    resource: "@KolyyaOAuthBundle/Resources/config/routing.yml"
+    prefix:   /
+```

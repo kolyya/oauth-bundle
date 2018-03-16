@@ -18,7 +18,7 @@ class OAuthUserProvider extends BaseClass
 {
     private $container;
     private $translator;
-    private $mailerUser;
+    //private $mailerUser;
     private $service;
     private $socialId;
     private $token;
@@ -28,18 +28,17 @@ class OAuthUserProvider extends BaseClass
      * @param TranslatorInterface $translator
      * @param ContainerInterface $container
      * @param UserManagerInterface $userManager
-     * @param null $mailerUser
      */
     public function  __construct(
         TranslatorInterface $translator,
         ContainerInterface $container,
-        UserManagerInterface $userManager,
-        $mailerUser = null
+        UserManagerInterface $userManager
+        //,$mailerUser = null
     )
     {
         $this->container = $container;
         $this->translator = $translator;
-        $this->mailerUser = $mailerUser;
+        //$this->mailerUser = $mailerUser;
 
         $this->userManager = $userManager;
         $this->accessor = PropertyAccess::createPropertyAccessor();
@@ -71,6 +70,9 @@ class OAuthUserProvider extends BaseClass
                 $this->socialId = $rawToken['user_id'];
         }
 
+        /**
+         * @var $user \App\Entity\User
+         */
         $user = null;
 
         // пытаемся найти пользователя по id
@@ -156,6 +158,9 @@ class OAuthUserProvider extends BaseClass
 
     /**
      * Срабатывает тогда, когда авторизованный пользователь пытается подключить еще одну соц.сеть
+     * @param UserInterface $user
+     * @param UserResponseInterface $response
+     * @throws \TypeError
      */
     public function connect(UserInterface $user, UserResponseInterface $response)
     {
@@ -200,43 +205,48 @@ class OAuthUserProvider extends BaseClass
         return $response->getResourceOwner()->getName().'Id';
     }
 
-    private function sendOAuthEmail($user){
-        $mailer = $this->container->get('mailer');
-        $templating = $this->container->get('templating');
-        $message = \Swift_Message::newInstance()
-            ->setSubject($this->translator->trans('email.welcome_title'))
-            ->setFrom($this->mailerUser,$this->translator->trans('email.welcome_user'))
-            ->setTo($user->getEmail())
-            ->setBody(
-                $templating->render('oauth/email_to_user.html.twig',array(
-                    'service' => $this->service,
-                    'id' => $this->socialID
-                )),'text/html'
-            )
-        ;
-        $mailer->send($message);
-        return true;
-    }
+//    private function sendOAuthEmail($user){
+//        $mailer = $this->container->get('mailer');
+//        $templating = $this->container->get('templating');
+//        $message = \Swift_Message::newInstance()
+//            ->setSubject($this->translator->trans('email.welcome_title'))
+//            ->setFrom($this->mailerUser,$this->translator->trans('email.welcome_user'))
+//            ->setTo($user->getEmail())
+//            ->setBody(
+//                $templating->render('oauth/email_to_user.html.twig',array(
+//                    'service' => $this->service,
+//                    'id' => $this->socialID
+//                )),'text/html'
+//            )
+//        ;
+//        $mailer->send($message);
+//        return true;
+//    }
 
-    private function sendConnectEmail($user){
-        $mailer = $this->container->get('mailer');
-        $templating = $this->container->get('templating');
-        $message = \Swift_Message::newInstance()
-            ->setSubject($this->translator->trans('email.connect_title'))
-            ->setFrom($this->mailerUser,$this->translator->trans('email.connect_user'))
-            ->setTo($user->getEmail())
-            ->setBody(
-                $templating->render(':user:email_connect.html.twig',array(
-                        'service' => $this->service,
-                        'id' => $this->socialID
-                    )),'text/html'
-            )
-        ;
-        $mailer->send($message);
-        return true;
-    }
+//    private function sendConnectEmail($user){
+//        $mailer = $this->container->get('mailer');
+//        $templating = $this->container->get('templating');
+//        $message = \Swift_Message::newInstance()
+//            ->setSubject($this->translator->trans('email.connect_title'))
+//            ->setFrom($this->mailerUser,$this->translator->trans('email.connect_user'))
+//            ->setTo($user->getEmail())
+//            ->setBody(
+//                $templating->render(':user:email_connect.html.twig',array(
+//                        'service' => $this->service,
+//                        'id' => $this->socialID
+//                    )),'text/html'
+//            )
+//        ;
+//        $mailer->send($message);
+//        return true;
+//    }
 
-    // запрашивает данные для записи в бд
+    /**
+     * запрашивает данные для записи в бд
+     * @param $user \App\Entity\User|UserInterface
+     * @param UserResponseInterface $response
+     * @return mixed
+     */
     private function setData($user, UserResponseInterface $response){
         $data = array(
             'photo_small'       => null,
@@ -250,7 +260,7 @@ class OAuthUserProvider extends BaseClass
             'email'             => null,
             'mobile_phone'      => null,
         );
-        $contactName = 'Пользователь';
+        //$contactName = 'Пользователь';
         switch ($this->service){
             case 'vkontakte':
                 $fields = array('photo_50', 'photo_200_orig', 'photo_max_orig', 'sex','bdate','nickname','contacts');
@@ -391,7 +401,7 @@ class OAuthUserProvider extends BaseClass
                 break;
         }
 
-        if($data['first_name'] || $data['last_name']) $contactName = $data['first_name'].($data['first_name'] ? ' ' : '').$data['last_name'];
+//        if($data['first_name'] || $data['last_name']) $contactName = $data['first_name'].($data['first_name'] ? ' ' : '').$data['last_name'];
 //        $user->setContactName($contactName);
 
         return $user;
