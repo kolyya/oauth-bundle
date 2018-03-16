@@ -3,9 +3,9 @@
 Installation
 ============
 
-1. Установить friendsofsymfony/user-bundle и настроить его.
+1. Установить и настроить `friendsofsymfony/user-bundle`
 
-2. 1
+2. Установить и настроить `hwi/oauth-bundle`
 
 Applications that use Symfony Flex
 ----------------------------------
@@ -57,3 +57,38 @@ class AppKernel extends Kernel
     // ...
 }
 ```
+
+## Integration
+
+В `config/services.yaml` сделать сервис публичным:
+
+```yaml
+    Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider:
+        public: true
+```
+
+и установить его в `config/packages/security.yaml`
+
+```yaml
+    firewalls:
+        # ...
+        main:
+            # ...
+            oauth:
+                # ...
+                oauth_user_provider:
+                    service: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
+        # ...
+```
+
+и в конфиг для `hwi_oauth`:
+
+```yaml
+hwi_oauth:
+    # ...
+    connect:
+        account_connector: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
+    # ...
+```
+
+## Configuration

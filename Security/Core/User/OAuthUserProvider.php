@@ -15,7 +15,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class OAuthUserProvider
- * @package AppBundle\Security\Core\User
  */
 class OAuthUserProvider extends BaseClass
 {
@@ -42,6 +41,8 @@ class OAuthUserProvider extends BaseClass
 
     /**
      * Срабатывает тогда, когда пользователь пытается войти через соц. сеть, хотя при этом еще не авторизован
+     * @param UserResponseInterface $response
+     * @return \FOS\UserBundle\Model\UserInterface|null
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
