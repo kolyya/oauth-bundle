@@ -24,6 +24,12 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('order')->cannotBeEmpty()->scalarPrototype()->end()
             ->end()
+            ->arrayNode('assets')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('soc_auth_stylesheet')->defaultValue('bundles/kolyyaoauth/soc_auth.css')->cannotBeEmpty()->end()
+                ->end()
+            ->end()
         ;
 
         // Here you should define the parameters that are allowed to

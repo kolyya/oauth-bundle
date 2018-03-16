@@ -1,0 +1,17 @@
+login:
+    vkontakte: Sign in with VK
+    facebook: Sign in with Facebook
+    odnoklassniki: Sign in with Odnoklassniki
+    mailru: Sign in with Mail.ru
+    google: Sign in with Google
+
+connect:
+    vkontakte: Link account VK
+    facebook: Link account Facebook
+    odnoklassniki: Link account Odnoklassniki
+    mailru: Link account Mail
+    google: Link account Google
+
+layout:
+    connect: Link
+    disconnect: Unlink

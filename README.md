@@ -192,3 +192,5 @@ kolyya_oauth:
     resource: "@KolyyaOAuthBundle/Resources/config/routing.yml"
     prefix:   /
 ```
+
+И удалить `hwi_oauth_` маршруты 
