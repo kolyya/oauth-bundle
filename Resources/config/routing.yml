@@ -1,0 +1,30 @@
+hwi_oauth_redirect:
+    resource: "@HWIOAuthBundle/Resources/config/routing/redirect.xml"
+    prefix:   /connect
+
+hwi_oauth_connect:
+    resource: "@HWIOAuthBundle/Resources/config/routing/connect.xml"
+    prefix:   /connect
+
+hwi_oauth_login:
+    resource: "@HWIOAuthBundle/Resources/config/routing/login.xml"
+    prefix:   /login
+
+kolyya_oauth_disconnect:
+    path: /ajax/kolyya_oauth/disconnect
+    defaults: { _controller: KolyyaOAuthBundle:Connect:disconnectAjax }
+
+facebook_login:
+    path: /login/check-facebook
+
+vkontakte_login:
+    path: /login/check-vkontakte
+
+odnoklassniki_login:
+    path: /login/check-odnoklassniki
+
+mailru_login:
+    path: /login/check-mailru
+
+google_login:
+    path: /login/check-google

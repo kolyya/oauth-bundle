@@ -1,0 +1,7 @@
+services:
+    kolyya_oauth.templating.helper:
+        class: Kolyya\OAuthBundle\Templating\Helper\OAuthHelper
+        public: false
+        arguments: ['@doctrine.orm.default_entity_manager','@service_container','@templating','%kolyya_oauth.order%']
+        tags:
+            - { name: templating.helper, alias: kolyya_oauth }

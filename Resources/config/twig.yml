@@ -1,0 +1,7 @@
+services:
+    kolyya_oauth.twig.extension:
+        class: Kolyya\OAuthBundle\Twig\Extension\OAuthExtension
+        public: false
+        arguments: [ '@kolyya_oauth.templating.helper' ]
+        tags:
+            - { name: twig.extension }

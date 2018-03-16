@@ -1,0 +1,5 @@
+services:
+    Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider:
+#        alias: 'kolyya_oauth.provider.oauth'
+#        public: true
+        arguments: ['@translator', '@service_container', '@fos_user.user_manager.default']
