@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('order')->cannotBeEmpty()->scalarPrototype()->end()
+                ->arrayNode('order')->requiresAtLeastOneElement()->scalarPrototype()->end()
             ->end()
             ->arrayNode('assets')
                 ->addDefaultsIfNotSet()
