@@ -10,11 +10,6 @@ abstract class OAuthUser extends BaseUser
     private $oAuthToken;
 
     /**
-     * @ORM\Column(type="string",length=32, nullable=true)
-     */
-    private $avatarId;
-
-    /**
      * @return mixed
      */
     public function getOAuthToken()
@@ -28,21 +23,5 @@ abstract class OAuthUser extends BaseUser
     public function setOAuthToken($oAuthToken)
     {
         $this->oAuthToken = $oAuthToken;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAvatarId()
-    {
-        return $this->avatarId;
-    }
-
-    /**
-     * @param mixed $avatarId
-     */
-    public function setAvatarId($avatarId): void
-    {
-        $this->avatarId = $avatarId;
     }
 }

@@ -19,6 +19,13 @@ class OAuthUserProvider extends BaseClass
     private $container;
     private $translator;
     //private $mailerUser;
+
+    // тут хранится весь ресурс
+    /**
+     * @var $resourceOwner \HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface
+     */
+    private $resourceOwner;
+
     private $service;
     private $socialId;
     private $token;
@@ -55,8 +62,11 @@ class OAuthUserProvider extends BaseClass
         // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
         $this->token = $response->getAccessToken();
 
+        // записываем ResourceOwner
+        $this->resourceOwner = $response->getResourceOwner();
+
         // записываем название соц. сети
-        $this->service = $response->getResourceOwner()->getName();
+        $this->service = $this->resourceOwner->getName();
 
         // записываем id соц. сети для поиска пользователя
         $this->socialId = $response->getUsername();
@@ -169,8 +179,11 @@ class OAuthUserProvider extends BaseClass
         // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
         $this->token = $response->getAccessToken();
 
+        // записываем ResourceOwner
+        $this->resourceOwner = $response->getResourceOwner();
+
         // записываем название соц. сети
-        $this->service = $response->getResourceOwner()->getName();
+        $this->service = $this->resourceOwner->getName();
 
         // записываем id соц. сети для поиска пользователя
         $this->socialId = $response->getUsername();
@@ -279,7 +292,6 @@ class OAuthUserProvider extends BaseClass
                 $data['email'] = $response->getEmail();
                 $data['mobile_phone'] = isset($obj->contacts) && isset($obj->contacts->mobile_phone) ? $obj->contacts->mobile_phone : null;
 
-                if(!$user->getAvatarId()) $user->setAvatarId('vk');
                 $user->setVkontakteData($data);
                 break;
             case 'facebook':
@@ -305,13 +317,12 @@ class OAuthUserProvider extends BaseClass
                 $obj = json_decode(file_get_contents($url));
                 $data['photo_big'] = $obj->picture->data->url;
 
-                if(!$user->getAvatarId()) $user->setAvatarId('fb');
                 $user->setFacebookData($data);
                 break;
             case 'google':
                 $params = array(
                     'access_token' => $this->token,
-                    'key' => $this->container->getParameter('oauth.google.client_secret'),
+                    'key' => $this->resourceOwner->getOption('client_secret'),
                 );
                 $json = file_get_contents('https://www.googleapis.com/plus/v1/people/'.$this->socialId.'?'.http_build_query($params));
                 $obj = json_decode($json);
@@ -328,13 +339,12 @@ class OAuthUserProvider extends BaseClass
                 $data['nickname'] = isset($obj->nickname) ? $obj->nickname : null;
                 $data['email'] = $response->getEmail();
 
-                if(!$user->getAvatarId()) $user->setAvatarId('gg');
                 $user->setGoogleData($data);
                 break;
             case 'odnoklassniki':
                 $fields = array('GENDER', 'FIRST_NAME', 'LAST_NAME','NAME','HAS_EMAIL','BIRTHDAY', 'EMAIL', 'PIC50X50','PIC190X190','PIC600X600');
                 $params = array(
-                    'application_key' => $this->container->getParameter('oauth.odnoklassniki.application_key'),
+                    'application_key' => $this->resourceOwner->getOption('application_key'),
                     'emptyPictures' => true,
                     'fields' => implode(',',$fields),
 //                    'format' => 'json',
@@ -349,7 +359,7 @@ class OAuthUserProvider extends BaseClass
                     if($key == 'access_token') continue;
                     $string .= $key.'='.$val;
                 }
-                $params['sig'] = md5($string.md5($this->token.$this->container->getParameter('oauth.odnoklassniki.client_secret')));
+                $params['sig'] = md5($string.md5($this->resourceOwner->getOption('client_secret')));
                 $url = 'https://api.ok.ru/fb.do?'.http_build_query($params);
                 $json = file_get_contents($url);
                 $obj = json_decode($json)[0];
@@ -363,12 +373,11 @@ class OAuthUserProvider extends BaseClass
                 $data['photo_big'] = isset($obj->pic600x600) ? $obj->pic600x600 : null;
                 $data['email'] = $response->getEmail();
 
-                if(!$user->getAvatarId()) $user->setAvatarId('ok');
                 $user->setOdnoklassnikiData($data);
                 break;
             case 'mailru':
                 $params = array(
-                    'app_id' => $this->container->getParameter('oauth.mailru.client_id'),
+                    'app_id' => $this->resourceOwner->getOption('client_id'),
                     'method' => 'users.getInfo',
                     'uids' => $this->socialId,
                     'secure' => 1,
@@ -379,7 +388,7 @@ class OAuthUserProvider extends BaseClass
                 foreach($params as $key => $val){
                     $string .= $key.'='.$val;
                 }
-                $params['sig'] = md5($string.$this->container->getParameter('oauth.mailru.client_secret'));
+                $params['sig'] = md5( $this->resourceOwner->getOption('client_secret') );
                 $url = 'http://www.appsmail.ru/platform/api?'.http_build_query($params);
                 $json = file_get_contents($url);
                 $obj = json_decode($json)[0];
@@ -396,7 +405,6 @@ class OAuthUserProvider extends BaseClass
                 $data['nickname'] = isset($obj->nick) ? $obj->nick : null;
                 $data['email'] = $response->getEmail();
 
-                if(!$user->getAvatarId()) $user->setAvatarId('mr');
                 $user->setMailruData($data);
                 break;
         }

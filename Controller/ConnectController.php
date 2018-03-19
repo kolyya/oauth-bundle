@@ -2,7 +2,6 @@
 
 namespace Kolyya\OAuthBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +13,6 @@ class ConnectController extends Controller
      */
     public function disconnectAjaxAction(Request $request)
     {
-
         $id = $request->get('id',null);
 
         $user = $this->getUser();
@@ -44,8 +42,6 @@ class ConnectController extends Controller
             $user->setGoogleData(null);
         }
 
-        if($user->getAvatarId() == $id) $user->setAvatarId(null);
-
         $em = $this->getDoctrine()->getManager();
         $em->persist($user);
         $em->flush();
@@ -54,5 +50,4 @@ class ConnectController extends Controller
             'success' => true
         ));
     }
-
 }
