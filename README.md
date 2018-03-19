@@ -1,5 +1,12 @@
 # Kolyya OAuth Bundle
 
+Бандл - оболочка для hwi/oauth-bundle и friendsofsymfony/user-bundle
+
+Создает кнопки входа и коннекта/дисконекта аккаунта соц. сетей
+Записывает данные из соц. сетей в бд (Имя, Фамилия, Телефон, ...)
+
+Пока доступны: Vkontakte Facebook Odnoklassniki Mailru Google
+
 Installation
 ============
 
@@ -194,3 +201,13 @@ kolyya_oauth:
 ```
 
 И удалить `hwi_oauth_` маршруты 
+
+## Configuration
+
+`order` - порядок и список доступных соц. сетей
+
+```yaml
+order: ['vkontakte', 'facebook', 'odnoklassniki','mailru','google']
+```
+
+`assets.soc_auth_stylesheet` - файл стилей кнопок входа
