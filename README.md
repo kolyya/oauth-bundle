@@ -72,9 +72,7 @@ class AppKernel extends Kernel
 ```yaml
 services:
     # ...
-    kolyya.oauth.user.provider:
-        class: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
-        arguments: ['','','','%env(MAILER_USER)%']
+    Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
         public: true
 ```
 
@@ -90,7 +88,7 @@ security:
             oauth:
                 # ...
                 oauth_user_provider:
-                    service: kolyya.oauth.user.provider
+                    service: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
         # ...
 ```
 
@@ -100,7 +98,7 @@ security:
 hwi_oauth:
     # ...
     connect:
-        account_connector: kolyya.oauth.user.provider
+        account_connector: Kolyya\OAuthBundle\Security\Core\User\OAuthUserProvider
     # ...
 ```
 
