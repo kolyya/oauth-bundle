@@ -318,6 +318,7 @@ class OAuthUserProvider extends BaseClass
     /**
      * @param $user \App\Entity\User|UserInterface
      * @param UserResponseInterface $response
+     * @return \App\Entity\User|UserInterface
      */
     private function setUsername($user, UserResponseInterface $response)
     {
@@ -340,6 +341,8 @@ class OAuthUserProvider extends BaseClass
 
             $user->setUsername($testUsername);
         }
+
+        return $user;
     }
 
     private function getUserBySoc(UserResponseInterface $response)
