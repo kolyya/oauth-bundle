@@ -7,6 +7,14 @@ use FOS\UserBundle\Model\User as BaseUser;
 
 abstract class OAuthUser extends BaseUser
 {
+    public static $IDS = array(
+        'vkontakte'         => 'vk',
+        'facebook'          => 'fb',
+        'odnoklassniki'     => 'ok',
+        'mailru'            => 'mr',
+        'google'            => 'gg',
+    );
+
     private $oAuthToken;
 
     /**

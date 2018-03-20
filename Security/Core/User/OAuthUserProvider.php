@@ -5,6 +5,7 @@ namespace Kolyya\OAuthBundle\Security\Core\User;
 use FOS\UserBundle\Model\UserManagerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
+use Kolyya\OAuthBundle\Entity\OAuthUser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\User\UserChecker;
@@ -18,7 +19,6 @@ class OAuthUserProvider extends BaseClass
 {
     private $container;
     private $translator;
-    //private $mailerUser;
 
     // тут хранится весь ресурс
     /**
@@ -27,7 +27,7 @@ class OAuthUserProvider extends BaseClass
     private $resourceOwner;
 
     private $service;
-    private $socialId;
+    private $socialId; // 1232131 838483483
     private $token;
 
     /**
@@ -58,28 +58,7 @@ class OAuthUserProvider extends BaseClass
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
-
-        // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
-        $this->token = $response->getAccessToken();
-
-        // записываем ResourceOwner
-        $this->resourceOwner = $response->getResourceOwner();
-
-        // записываем название соц. сети
-        $this->service = $this->resourceOwner->getName();
-
-        // записываем id соц. сети для поиска пользователя
-        $this->socialId = $response->getUsername();
-
-        // если $this->socialId не удалось получить, то пытаемся достать его из токена
-        if(!$this->socialId){
-
-            $rawToken = $response->getOAuthToken()->getRawToken();
-
-            if(isset($rawToken['user_id']) && $rawToken['user_id'])
-                $this->socialId = $rawToken['user_id'];
-        }
-
+        $this->processResponse($response);
         /**
          * @var $user \App\Entity\User
          */
@@ -87,74 +66,49 @@ class OAuthUserProvider extends BaseClass
 
         // пытаемся найти пользователя по id
         if($this->socialId)
-            $user = $this->userManager->findUserBy(array($this->service.'Id'=>$this->socialId));
+            $user = $this->userManager
+                ->findUserBy(array(
+                    $this->getProperty($response) => $this->socialId
+                ));
 
-//        var_dump([
-//            'service' => $this->service,
-//            'socialId' => $this->socialId,
-//            'getNickname' => $response->getNickname(),
-//            'getFirstName' => $response->getFirstName(),
-//            'getLastName' => $response->getLastName(),
-//            'getRealName' => $response->getRealName(),
-//            'getEmail' => $response->getEmail(),
-//            'getProfilePicture' => $response->getProfilePicture(),
-//        ]);
-//        exit();
-
-        // если пользователь не найден, создает нового
+        // если пользователь не найден
+        // создает нового c новым паролем и автивированного
+        // запрашиваем данные для сохранения
+        // ставим id соц. сети
+        // ставим новый УНИКАЛЬНЫЙ юзернейм
         if(null === $user){
 
-            // пытаемся найти пользователя по email
-            $user = $this->userManager->findUserByEmail($response->getEmail());
+//            // пытаемся найти пользователя по email
+//            $user = $this->userManager
+//                ->findUserByEmail($response->getEmail());
+//
+//            // если пользователя с такой почтой не найдено
+//            if (null === $user || !$user instanceof UserInterface) {
+//
+//                $user = $this->userManager->createUser();
+//                if($response->getEmail()) {
+//                    $user->setEmail($response->getEmail());
+//                } else {
+//                    $user->setEmail('');
+//                    // todo: что делать, если нет почты у соц. сети?
+//                }
+//                $user->setPlainPassword(md5(uniqid()));
+//                $user->setEnabled(true);
+//
+//            }
 
-            // если пользователя с такой почтой не найдено
-            if (null === $user || !$user instanceof UserInterface) {
+            $user = $this->userManager->createUser();
+            $user->setEmail('');
+            $user->setPlainPassword(md5(uniqid()));
+            $user->setEnabled(true);
 
-                $user = $this->userManager->createUser();
-                if($response->getEmail()) {
-                    $user->setEmail($response->getEmail());
-                } else {
-                    $user->setEmail('');
-                    // todo: что делать, если нет почты у соц. сети?
-                }
-                $user->setPlainPassword(md5(uniqid()));
-                $user->setEnabled(true);
-
-            }
-
-            // обрабатываем соц. сети
-            switch ($this->service){
-                case 'vkontakte':
-                    $user->setVkontakteId($this->socialId);
-                    $user->setUsername('vk_'.$this->socialId);
-                    break;
-                case 'facebook':
-                    $user->setFacebookId($this->socialId);
-                    $user->setUsername('fb_'.$this->socialId);
-                    break;
-                case 'odnoklassniki':
-                    $user->setOdnoklassnikiId($this->socialId);
-                    $user->setUsername('ok_'.$this->socialId);
-                    break;
-                case 'mailru':
-                    $user->setMailruId($this->socialId);
-                    $user->setUsername('mr_'.$this->socialId);
-                    break;
-                case 'google':
-                    $user->setGoogleId($this->socialId);
-                    $user->setUsername('gg_'.$this->socialId);
-                    break;
-            }
-
-            // запрашиваем данные для сохранения
             $user = $this->setData($user, $response);
+            $user = $this->setUsername($user, $response);
+
+            $user->{'set'.ucfirst($this->service).'Id'}($this->socialId);
 
             // обновляем пользователя
             $this->userManager->updateUser($user);
-
-            // отсылаем пользователю сообщение о регистрации
-            //$this->sendOAuthEmail($user);
-
         }
 
         // если пользователь найден
@@ -174,19 +128,7 @@ class OAuthUserProvider extends BaseClass
      */
     public function connect(UserInterface $user, UserResponseInterface $response)
     {
-        // todo: проверка $user на то, что это User
-
-        // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
-        $this->token = $response->getAccessToken();
-
-        // записываем ResourceOwner
-        $this->resourceOwner = $response->getResourceOwner();
-
-        // записываем название соц. сети
-        $this->service = $this->resourceOwner->getName();
-
-        // записываем id соц. сети для поиска пользователя
-        $this->socialId = $response->getUsername();
+        $this->processResponse($response);
 
         $property = $this->getProperty($response);
 
@@ -218,41 +160,33 @@ class OAuthUserProvider extends BaseClass
         return $response->getResourceOwner()->getName().'Id';
     }
 
-//    private function sendOAuthEmail($user){
-//        $mailer = $this->container->get('mailer');
-//        $templating = $this->container->get('templating');
-//        $message = \Swift_Message::newInstance()
-//            ->setSubject($this->translator->trans('email.welcome_title'))
-//            ->setFrom($this->mailerUser,$this->translator->trans('email.welcome_user'))
-//            ->setTo($user->getEmail())
-//            ->setBody(
-//                $templating->render('oauth/email_to_user.html.twig',array(
-//                    'service' => $this->service,
-//                    'id' => $this->socialID
-//                )),'text/html'
-//            )
-//        ;
-//        $mailer->send($message);
-//        return true;
-//    }
+    /**
+     * Данные из запроса записывает в параметры
+     * @param UserResponseInterface $response
+     */
+    private function processResponse(UserResponseInterface $response)
+    {
+        // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
+        $this->token = $response->getAccessToken();
 
-//    private function sendConnectEmail($user){
-//        $mailer = $this->container->get('mailer');
-//        $templating = $this->container->get('templating');
-//        $message = \Swift_Message::newInstance()
-//            ->setSubject($this->translator->trans('email.connect_title'))
-//            ->setFrom($this->mailerUser,$this->translator->trans('email.connect_user'))
-//            ->setTo($user->getEmail())
-//            ->setBody(
-//                $templating->render(':user:email_connect.html.twig',array(
-//                        'service' => $this->service,
-//                        'id' => $this->socialID
-//                    )),'text/html'
-//            )
-//        ;
-//        $mailer->send($message);
-//        return true;
-//    }
+        // записываем ResourceOwner
+        $this->resourceOwner = $response->getResourceOwner();
+
+        // записываем название соц. сети
+        $this->service = $this->resourceOwner->getName();
+
+        // записываем id соц. сети для поиска пользователя
+        $this->socialId = $response->getUsername();
+
+        // если $this->socialId не удалось получить, то пытаемся достать его из токена
+        if(!$this->socialId){
+
+            $rawToken = $response->getOAuthToken()->getRawToken();
+
+            if(isset($rawToken['user_id']) && $rawToken['user_id'])
+                $this->socialId = $rawToken['user_id'];
+        }
+    }
 
     /**
      * запрашивает данные для записи в бд
@@ -409,10 +343,33 @@ class OAuthUserProvider extends BaseClass
                 break;
         }
 
-//        if($data['first_name'] || $data['last_name']) $contactName = $data['first_name'].($data['first_name'] ? ' ' : '').$data['last_name'];
-//        $user->setContactName($contactName);
-
         return $user;
     }
 
+    /**
+     * @param $user \App\Entity\User|UserInterface
+     * @param UserResponseInterface $response
+     */
+    private function setUsername($user, UserResponseInterface $response)
+    {
+        switch ($this->service)
+        {
+            // todo: в зависимости от соц. сети ставить нормальный username
+            default:
+                $username = OAuthUser::$IDS[$this->service].'_'.$this->socialId;
+        }
+
+        $i = 0;
+        while (!$user->getUsername())
+        {
+            // если пользователь с таким username уже существует
+            $testUsername = $username.($i?'_'.$i:'');
+            if($this->userManager->findUserBy(array('username' => $testUsername))) {
+                $i++;
+                continue;
+            }
+
+            $user->setUsername($testUsername);
+        }
+    }
 }
