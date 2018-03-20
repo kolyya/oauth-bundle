@@ -2,39 +2,46 @@
 
 namespace Kolyya\OAuthBundle\Templating\Helper;
 
-use Doctrine\ORM\EntityManager;
-use Symfony\Component\DependencyInjection\Container;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 class OAuthHelper extends Helper
 {
+    public static $IDS = array(
+        'vkontakte'         => 'vk',
+        'facebook'          => 'fb',
+        'odnoklassniki'     => 'ok',
+        'mailru'            => 'mr',
+        'google'            => 'gg',
+    );
 
     private $em;
     private $container;
     private $templating;
-    private $order;
+    private $config;
 
-    public function __construct(EntityManager $em, Container $container, $templating, $order)
+    public function __construct(EntityManagerInterface $em, ContainerInterface $container, $templating, $config)
     {
         $this->em = $em;
         $this->container = $container;
         $this->templating = $templating;
-        $this->order = $order;
+        $this->config = $config;
     }
 
-    public function getButtons(){
+    public function getOauthButtons(){
 
-        $ids = array(
-            'vkontakte' => 'vk',
-            'facebook' => 'fb',
-            'odnoklassniki' => 'ok',
-            'mailru' => 'mr',
-            'google' => 'gg',
-        );
+        return $this->templating->render('KolyyaOAuthBundle:OAuth:auth.html.twig', array(
+            'order' => $this->config['order'],
+            'ids' => self::$IDS
+        ));
+    }
 
-        return $this->templating->render('KolyyaOAuthBundle:OAuth:soc_auth.html.twig',array(
-            'order' => $this->order,
-            'ids' => $ids
+    public function getConnectButtons(){
+
+        return $this->templating->render('KolyyaOAuthBundle:OAuth:connect.html.twig', array(
+            'order' => $this->config['order'],
+            'ids' => self::$IDS
         ));
     }
 

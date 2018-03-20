@@ -19,13 +19,19 @@ class OAuthExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('kolyya_oauth_buttons', array($this, 'getButtons'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('kolyya_oauth_buttons', array($this, 'getOauthButtons'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('kolyya_connect_buttons', array($this, 'getConnectButtons'), array('is_safe' => array('html'))),
         );
     }
 
-    public function getButtons()
+    public function getOauthButtons()
     {
-        return $this->helper->getButtons();
+        return $this->helper->getOauthButtons();
+    }
+
+    public function getConnectButtons()
+    {
+        return $this->helper->getConnectButtons();
     }
 
     /**

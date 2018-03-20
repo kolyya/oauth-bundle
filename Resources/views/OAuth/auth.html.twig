@@ -2,6 +2,8 @@
 
 <link rel="stylesheet" href="{{ asset('bundles/kolyyaoauth/css/soc_auth.css') }}" />
 
+<div class="kolyya-oauth">
 {% for item in order %}
     <a href="{{ hwi_oauth_login_url(item) }}" class="soc__btn soc__btn_{{ ids[item] }}"><div class="soc__light">{{ ('login.'~item)|trans }}</div></a>
 {% endfor %}
+</div>

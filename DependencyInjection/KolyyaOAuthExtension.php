@@ -27,7 +27,7 @@ class KolyyaOAuthExtension extends Extension
         $loader->load('templating.yml');
         $loader->load('twig.yml');
 
-        $container->setParameter('kolyya_oauth.order', $config['order']);
+        $container->setParameter('kolyya_oauth', $config);
     }
 
     public function getAlias()
