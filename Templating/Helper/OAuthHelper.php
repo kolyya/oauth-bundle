@@ -2,8 +2,7 @@
 
 namespace Kolyya\OAuthBundle\Templating\Helper;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 class OAuthHelper extends Helper
@@ -16,15 +15,16 @@ class OAuthHelper extends Helper
         'google'            => 'gg',
     );
 
-    private $em;
-    private $container;
+    /**
+     * @var $user \App\Entity\User
+     */
+    private $user;
     private $templating;
     private $config;
 
-    public function __construct(EntityManagerInterface $em, ContainerInterface $container, $templating, $config)
+    public function __construct(TokenStorageInterface $tokenStorage, $templating, $config)
     {
-        $this->em = $em;
-        $this->container = $container;
+        $this->user = $tokenStorage->getToken()->getUser();
         $this->templating = $templating;
         $this->config = $config;
     }
@@ -39,9 +39,19 @@ class OAuthHelper extends Helper
 
     public function getConnectButtons(){
 
+        $buttons = array();
+
+        foreach ($this->config['order'] as $item){
+            array_push($buttons, array(
+               'item' => $item,
+               'item_id' => self::$IDS[$item],
+               'soc_id' => $this->user->{'get'.ucfirst($item).'Id'}(),
+               'soc_data' => $this->user->{'get'.ucfirst($item).'Data'}(),
+            ));
+        }
+
         return $this->templating->render('KolyyaOAuthBundle:OAuth:connect.html.twig', array(
-            'order' => $this->config['order'],
-            'ids' => self::$IDS
+            'buttons' => $buttons,
         ));
     }
 

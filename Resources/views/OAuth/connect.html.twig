@@ -2,33 +2,34 @@
 <link rel="stylesheet" href="{{ asset('bundles/kolyyaoauth/css/connect.css') }}">
 <div class="kolyya-oauth">
 <div class="connect-list">
-{#{% for connect in [#}
-    {#{item:'vkontakte', type: 'vk', id: user.vkontakteId, data: user.vkontakteData},#}
-    {#{item:'facebook', type: 'fb', id: user.facebookId, data: user.facebookData},#}
-    {#{item:'odnoklassniki', type: 'ok', id: user.odnoklassnikiId, data: user.odnoklassnikiData},#}
-    {#{item:'mailru', type: 'mr', id: user.mailruId, data: user.mailruData},#}
-    {#{item:'google', type: 'gg', id: user.googleId, data: user.googleData},#}
-{#] %}#}
-
-    {#{% set type = connect.type %}#}
-    {#{% set data = connect.data %}#}
-    {#<div class="connect-item-wrap">#}
-        {#<div class="connect-item connect-item_type_{{ type }}{{ connect.id and data ? '':' connect-item_no-connect' }}">#}
-            {#<div class="connect-item__icon connect-item__icon_type_{{ type }}{{ connect.id and data ? '':' connect-item__icon_no-connect' }}"></div>#}
-            {#{% if connect.id and data%}#}
-                {#<div class="connect-item__avatar" style="background-image: url('{{ data.photo_small }}');"></div>#}
-                {#<div class="connect-item__data">#}
-                    {#<div class="connect-item__name">{{ data.first_name }} {{ data.last_name }}</div>#}
-                    {#<a href="" onclick="disconnect('{{ type }}'); return false;" class="connect-item__disconnect">{{ 'layout.disconnect'|trans }}</a>#}
-                {#</div>#}
-            {#{% else %}#}
-                {#<a class="connect-item__connect" title="{{ ('connect.'~connect.item)|trans }}" href="{{ hwi_oauth_login_url(connect.item) }}">{{ 'layout.connect'|trans }} </a>#}
-            {#{% endif %}#}
-        {#</div>#}
-    {#</div>#}
-
-
-{#{% endfor %}#}
+    {% for button in buttons %}
+        {% set item = button.item %}
+        {% set type = button.item_id %}
+        {% set id = button.soc_id %}
+        {% set data = button.soc_data %}
+        <div class="connect-item-wrap">
+        <div class="connect-item connect-item_type_{{ type }}{{ id and data ? '':' connect-item_no-connect' }}">
+            <div class="connect-item__icon connect-item__icon_type_{{ type }}{{ id and data ? '':' connect-item__icon_no-connect' }}"></div>
+            {% if id and data %}
+                <div class="connect-item__avatar"
+                     style="background-image: url('{{ data.photo_small }}');"
+                ></div>
+                <div class="connect-item__data">
+                <div class="connect-item__name">{{ data.first_name }} {{ data.last_name }}</div>
+                <a href=""
+                   onclick="disconnect('{{ type }}'); return false;"
+                   class="connect-item__disconnect"
+                >{{ 'layout.disconnect'|trans }}</a>
+                </div>
+            {% else %}
+                <a class="connect-item__connect"
+                   title="{{ ('connect.'~item)|trans }}"
+                   href="{{ hwi_oauth_login_url(item) }}"
+                >{{ 'layout.connect'|trans }} </a>
+            {% endif %}
+            </div>
+        </div>
+    {% endfor %}
 </div>
 </div>
 
