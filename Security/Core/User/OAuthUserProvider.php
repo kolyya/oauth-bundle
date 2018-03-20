@@ -58,44 +58,22 @@ class OAuthUserProvider extends BaseClass
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
-        $this->processResponse($response);
+        $this->__processResponse($response);
         /**
          * @var $user \App\Entity\User
          */
         $user = null;
 
         // пытаемся найти пользователя по id
-        if($this->socialId)
-            $user = $this->userManager
-                ->findUserBy(array(
-                    $this->getProperty($response) => $this->socialId
-                ));
+        $user = $this->getUserBySoc($response);
 
-        // если пользователь не найден
-        // создает нового c новым паролем и автивированного
-        // запрашиваем данные для сохранения
-        // ставим id соц. сети
-        // ставим новый УНИКАЛЬНЫЙ юзернейм
         if(null === $user){
 
-//            // пытаемся найти пользователя по email
-//            $user = $this->userManager
-//                ->findUserByEmail($response->getEmail());
-//
-//            // если пользователя с такой почтой не найдено
-//            if (null === $user || !$user instanceof UserInterface) {
-//
-//                $user = $this->userManager->createUser();
-//                if($response->getEmail()) {
-//                    $user->setEmail($response->getEmail());
-//                } else {
-//                    $user->setEmail('');
-//                    // todo: что делать, если нет почты у соц. сети?
-//                }
-//                $user->setPlainPassword(md5(uniqid()));
-//                $user->setEnabled(true);
-//
-//            }
+            // если пользователь НЕ найден
+            // создает нового c новым паролем и автивированного
+            // запрашиваем данные для сохранения
+            // ставим id соц. сети
+            // ставим новый УНИКАЛЬНЫЙ юзернейм
 
             $user = $this->userManager->createUser();
             $user->setEmail('');
@@ -109,10 +87,10 @@ class OAuthUserProvider extends BaseClass
 
             // обновляем пользователя
             $this->userManager->updateUser($user);
-        }
+        } else {
 
-        // если пользователь найден
-        else {
+            // если пользователь найден
+
             $checker = new UserChecker();
             $checker->checkPreAuth($user);
         }
@@ -128,31 +106,22 @@ class OAuthUserProvider extends BaseClass
      */
     public function connect(UserInterface $user, UserResponseInterface $response)
     {
-        $this->processResponse($response);
+        $this->__processResponse($response);
 
-        $property = $this->getProperty($response);
+        // пытаемся найти пользователя по id
+        // если найден, то удаляем его данные из предыдущего аккаунта
+        if($previousUser = $this->getUserBySoc($response)){
+            $previousUser->{'set'.ucfirst($this->service).'Id'}(null);
+            $previousUser->{'set'.ucfirst($this->service).'Data'}(null);
 
-        // Symfony <2.5 BC
-        if (method_exists($this->accessor, 'isWritable') && !$this->accessor->isWritable($user, $property)
-            || !method_exists($this->accessor, 'isWritable') && !method_exists($user, 'set'.ucfirst($property))) {
-            throw new \RuntimeException(sprintf("Class '%s' must have defined setter method for property: '%s'.", get_class($user), $property));
+            $this->userManager->updateUser($previousUser);
         }
 
-        // Пытаемся найти по этой соц. сети и id
-        if (null !== $previousUser = $this->userManager->findUserBy(array($property => $this->socialId))) {
-            $this->disconnect($previousUser, $response);
-        }
-
-        // записываем данные в бд
-        $user = $this->setData($user, $response);
-
-        $this->accessor->setValue($user, $property, $this->socialId);
+        $user->{'set'.ucfirst($this->service).'Id'}($this->socialId);
+        $this->setData($user, $response);
 
         // обновляем пользователя
         $this->userManager->updateUser($user);
-
-        // отсылаем ему email
-        //$this->sendConnectEmail($user);
     }
 
     public function getProperty(UserResponseInterface $response)
@@ -164,7 +133,7 @@ class OAuthUserProvider extends BaseClass
      * Данные из запроса записывает в параметры
      * @param UserResponseInterface $response
      */
-    private function processResponse(UserResponseInterface $response)
+    private function __processResponse(UserResponseInterface $response)
     {
         // записываем AccessToken, может пригодится для запроса данных из некоторых соц. сетей
         $this->token = $response->getAccessToken();
@@ -371,5 +340,17 @@ class OAuthUserProvider extends BaseClass
 
             $user->setUsername($testUsername);
         }
+    }
+
+    private function getUserBySoc(UserResponseInterface $response)
+    {
+        $user = null;
+        if($this->socialId)
+            $user = $this->userManager
+                ->findUserBy(array(
+                    $this->getProperty($response) => $this->socialId
+                ));
+
+        return $user;
     }
 }
