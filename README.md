@@ -191,10 +191,10 @@ class User extends OAuthUser
 ### Добавить кнопки на профиль пользователя
 
 ```twig
-{# templates/bundles/FOSUserBundle/Security/login.html.twig #}
+{# templates/bundles/FOSUserBundle/Profile/show_content.html.twig #}
 
 {# ... #}
-{{ kolyya_oauth_buttons() }}
+{{ kolyya_connect_buttons() }}
 {# ... #}
 
 ```

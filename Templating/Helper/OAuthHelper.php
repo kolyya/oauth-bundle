@@ -24,7 +24,8 @@ class OAuthHelper extends Helper
 
     public function __construct(TokenStorageInterface $tokenStorage, $templating, $config)
     {
-        $this->user = $tokenStorage->getToken()->getUser();
+        if($tokenStorage->getToken())
+            $this->user = $tokenStorage->getToken()->getUser();
         $this->templating = $templating;
         $this->config = $config;
     }
