@@ -17,7 +17,7 @@
         "symfony/security-bundle": "^3.0 || ^4.0",
         "symfony/twig-bundle": "^3.0 || ^4.0",
         "friendsofsymfony/user-bundle": "^2.0",
-        "hwi/oauth-bundle": "0.6.*"
+        "hwi/oauth-bundle": "0.6.*|dev-master"
     },
     "autoload" : {
         "psr-4" : { "Kolyya\\OAuthBundle\\" : "" }
