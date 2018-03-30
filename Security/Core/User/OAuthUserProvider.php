@@ -76,7 +76,7 @@ class OAuthUserProvider extends BaseClass
             // ставим новый УНИКАЛЬНЫЙ юзернейм
 
             $user = $this->userManager->createUser();
-            $user->setEmail('');
+            $user->setEmail(md5(uniqid()));
             $user->setPlainPassword(md5(uniqid()));
             $user->setEnabled(true);
 
@@ -262,7 +262,7 @@ class OAuthUserProvider extends BaseClass
                     if($key == 'access_token') continue;
                     $string .= $key.'='.$val;
                 }
-                $params['sig'] = md5($string.md5($this->resourceOwner->getOption('client_secret')));
+                $params['sig'] = md5($string.md5($this->token . $this->resourceOwner->getOption('client_secret')));
                 $url = 'https://api.ok.ru/fb.do?'.http_build_query($params);
                 $json = file_get_contents($url);
                 $obj = json_decode($json)[0];
