@@ -291,7 +291,7 @@ class OAuthUserProvider extends BaseClass
                 foreach($params as $key => $val){
                     $string .= $key.'='.$val;
                 }
-                $params['sig'] = md5( $this->resourceOwner->getOption('client_secret') );
+                $params['sig'] = md5($string.$this->resourceOwner->getOption('client_secret'));
                 $url = 'http://www.appsmail.ru/platform/api?'.http_build_query($params);
                 $json = file_get_contents($url);
                 $obj = json_decode($json)[0];
