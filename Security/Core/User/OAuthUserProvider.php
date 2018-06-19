@@ -180,7 +180,11 @@ class OAuthUserProvider extends BaseClass
         switch ($this->service){
             case 'vkontakte':
                 $fields = array('photo_50', 'photo_200_orig', 'photo_max_orig', 'sex','bdate','nickname','contacts');
-                $url = 'https://api.vk.com/method/users.get?user_ids='.$this->socialId.'&v=5.71&fields='.implode(',',$fields);
+                $url = 'https://api.vk.com/method/users.get?user_ids='.$this->socialId
+                    .'&v=5.71'
+                    .'&fields='.implode(',',$fields)
+                    .'&access_token='.$response->getAccessToken()
+                ;
                 $json = file_get_contents($url);
                 $obj = json_decode($json)->response[0];
 
