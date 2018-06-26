@@ -22,7 +22,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('order')->requiresAtLeastOneElement()->scalarPrototype()->end()
+                ->arrayNode('order')->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
+                ->scalarNode('public_dir')->defaultValue('public')->end()
+                ->scalarNode('avatar_path')->defaultValue('avatar')->end()
             ->end()
         ;
 

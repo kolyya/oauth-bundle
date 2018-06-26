@@ -211,18 +211,18 @@ class OAuthUserProvider extends BaseClass
                 $data['first_name'] = $obj->first_name;
                 $data['last_name'] = $obj->last_name;
                 $data['birthday'] = isset($obj->birthday) ? date('d.m.Y',strtotime($obj->birthday)) : null;
-                $data['photo_small'] = $obj->picture->data->url;
+                $data['photo_small'] = $this->_savePicture($obj->picture->data->url);
                 $data['nickname'] = isset($obj->middle_name) ? $obj->middle_name : null;
                 $data['email'] = $response->getEmail();
 
                 $url = $graph.'&fields=picture.type(large)';
                 $obj = json_decode(file_get_contents($url));
-                $data['photo_medium'] = $obj->picture->data->url;
+                $data['photo_medium'] = $this->_savePicture($obj->picture->data->url);
 
 
                 $url = $graph.'&fields=picture.width(400)';
                 $obj = json_decode(file_get_contents($url));
-                $data['photo_big'] = $obj->picture->data->url;
+                $data['photo_big'] = $this->_savePicture($obj->picture->data->url);
 
                 $user->setFacebookData($data);
                 break;
@@ -359,5 +359,21 @@ class OAuthUserProvider extends BaseClass
                 ));
 
         return $user;
+    }
+
+    /**
+     * Сохраняет фотографию и возвращает ее путь на сервере
+     * @param $url
+     * @return string
+     */
+    private function _savePicture($url){
+        $root = $this->container->getParameter('kernel.project_dir');
+
+        $content = file_get_contents($url);
+        $fileName = uniqid('', true).'.jpg';
+        $publicDir = '/'.$this->container->getParameter('kolyya_oauth')['public_dir']; // public
+        $path = '/'.$this->container->getParameter('kolyya_oauth')['avatar_path'].'/'; // /avatar/
+        file_put_contents($root.'/'.$publicDir.$path.$fileName, $content);
+        return $path.$fileName;
     }
 }
