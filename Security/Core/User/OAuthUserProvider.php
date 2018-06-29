@@ -182,7 +182,7 @@ class OAuthUserProvider extends BaseClass
 
                 $lang = 0;
                 $data = $response->getData();
-                if(property_exists($data, 'lang') && in_array($data['lang'],[0,1,2,3,4,5,6,7]))
+                if(array_key_exists('lang', $data) && in_array($data['lang'],[0,1,2,3,4,5,6,7]))
                     $lang = $data['lang'];
 
                 $fields = array('photo_50', 'photo_200_orig', 'photo_max_orig', 'sex','bdate','nickname','contacts');
