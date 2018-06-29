@@ -179,8 +179,15 @@ class OAuthUserProvider extends BaseClass
         //$contactName = 'Пользователь';
         switch ($this->service){
             case 'vkontakte':
+
+                $lang = 0;
+                $data = $response->getData();
+                if(property_exists($data, 'lang') && in_array($data['lang'],[0,1,2,3,4,5,6,7]))
+                    $lang = $data['lang'];
+
                 $fields = array('photo_50', 'photo_200_orig', 'photo_max_orig', 'sex','bdate','nickname','contacts');
                 $url = 'https://api.vk.com/method/users.get?user_ids='.$this->socialId
+                    .'&lang='.$lang
                     .'&v=5.71'
                     .'&fields='.implode(',',$fields)
                     .'&access_token='.$response->getAccessToken()
