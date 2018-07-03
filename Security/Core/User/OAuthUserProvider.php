@@ -185,7 +185,7 @@ class OAuthUserProvider extends BaseClass
                 if(array_key_exists('lang', $data) && in_array($data['lang'],[0,1,2,3,4,5,6,7]))
                     $lang = $data['lang'];
 
-                $fields = array('photo_50', 'photo_200', 'photo_max_orig', 'sex','bdate','nickname','contacts');
+                $fields = array('photo_50', 'photo_100', 'photo_200', 'photo_max_orig', 'sex','bdate','nickname','contacts');
                 $url = 'https://api.vk.com/method/users.get?user_ids='.$this->socialId
                     .'&lang='.$lang
                     .'&v=5.71'
@@ -201,6 +201,7 @@ class OAuthUserProvider extends BaseClass
                 $data['birthday'] = isset($obj->bdate) ? $obj->bdate : null;
                 $data['photo_small'] = isset($obj->photo_50) ? $obj->photo_50 : null;
                 $data['photo_medium'] = isset($obj->photo_200) ? $obj->photo_200 : null;
+                if(!$data['photo_medium']) $data['photo_medium'] = isset($obj->photo_100) ? $obj->photo_100 : null;
                 $data['photo_big'] = isset($obj->photo_max_orig) ? $obj->photo_max_orig : null;
                 $data['nickname'] = strlen($obj->nickname) ? $obj->nickname : null;
                 $data['email'] = $response->getEmail();
