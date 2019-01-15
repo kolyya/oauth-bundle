@@ -5,7 +5,7 @@ namespace Kolyya\OAuthBundle\Security\Core\User;
 use FOS\UserBundle\Model\UserManagerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
-use Kolyya\OAuthBundle\Entity\OAuthUser;
+use Kolyya\OAuthBundle\Enum\ServiceIdEnum;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\User\UserChecker;
@@ -338,7 +338,7 @@ class OAuthUserProvider extends BaseClass
         {
             // todo: в зависимости от соц. сети ставить нормальный username
             default:
-                $username = OAuthUser::$IDS[$this->service].'_'.$this->socialId;
+                $username = ServiceIdEnum::$IDS[$this->service].'_'.$this->socialId;
         }
 
         $i = 0;
